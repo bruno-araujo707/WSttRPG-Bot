@@ -1,0 +1,14 @@
+{
+    "COMMANDS": {
+        "CREATE_CHARACTER": {
+            "NAME": "create-character",
+            "DESCRIPTION": "Starts the character creation process.",
+            "RESPONSE": "Hello {username}! What will be your new character name?"
+        }
+    },
+    "CHARACTER_SHEET": {
+        "LEVEL": "Level",
+        "CLASS": "Class",
+        "HP": "Health Points"
+    }
+}
