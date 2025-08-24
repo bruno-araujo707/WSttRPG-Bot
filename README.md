@@ -1,0 +1,1 @@
+# WSttRPG-Bot
