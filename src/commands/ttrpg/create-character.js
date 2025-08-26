@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, TextChannel } = require('discord.js');
+const characterService = require('../../service/characterService');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -41,9 +42,24 @@ module.exports = {
 				.setDescription('The character owner')
 		),
 	async execute(interaction) {
-		const characterName = interaction.options.getString('name');
 		const characterOwner = interaction.options.getUser('target') ?? interaction.member;
+		const userId = characterOwner.id;
+		const characterData = {
+			name: interaction.options.getString('name'),
+			strength: interaction.options.getNumber('strength'),
+			dexterity: interaction.options.getNumber('dexterity'),
+			knowledge: interaction.options.getNumber('knowledge'),
+			psyche: interaction.options.getNumber('psyche'),
+			face: interaction.options.getNumber('face'),
+			userId: userId
+		};
 
-		await interaction.reply(`Character ${characterName} was created. Owner: ${characterOwner.displayName}`)
+		const newCharacter = await characterService.createCharacter(characterData);
+
+		if (newCharacter) {
+			await interaction.reply(`Character ${characterData.name} was created. Owner: ${characterOwner.displayName}`);
+		} else {
+			await interaction.reply('Error when trying to create character. Please try again.');
+		}
 	},
 };

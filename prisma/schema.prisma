@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  discordUserId String @unique
+  characters Character[]
+}
+
+model Character {
+  id  Int @id @default(autoincrement())
+  name String
+  slug String
+  imageUrl String?
+  strength Int
+  dexterity Int
+  knowledge Int
+  psyche Int
+  face Int
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  attacks Attack[]
+}
+
+model Attack {
+  id Int @id @default(autoincrement())
+  name String
+  slug String
+  imageUrl String?
+  power Int
+  total_coins Int
+  coinPower Int
+  coinDamage Int
+  character Character @relation(fields: [characterId], references: [id])
+  characterId Int
+}
