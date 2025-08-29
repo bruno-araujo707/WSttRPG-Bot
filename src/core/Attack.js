@@ -1,4 +1,49 @@
+const Helper = require('../core/Helper');
+
 class Attack {
+    constructor(
+        name,
+        power,
+        totalCoins,
+        coinPower,
+        coinDamage,
+        characterId
+    ) {
+        this.name = name;
+        this.power = power;
+        this.totalCoins = totalCoins;
+        this.coinPower = coinPower;
+        this.coinDamage = coinDamage;
+        this.characterId = characterId;
+        this.slug = function() {
+            return Helper.slugify(this.name);
+        }
+    }
+
+    static fromPrisma(prismaAttack) {
+        if (!prismaAttack) {
+            return null;
+        }
+        return new Attack(
+            prismaAttack.name,
+            prismaAttack.power,
+            prismaAttack.totalCoins,
+            prismaAttack.coinPower,
+            prismaAttack.coinDamage,
+            prismaAttack.slug,
+        );
+    }
+
+    useAttack()
+    {
+        return Attack.flipCoins(
+            this.totalCoins,
+            this.power,
+            this.coinPower,
+            this.coinDamage
+        );
+    }
+
     static flipCoins(totalCoins, basePower, coinPower, coinDamage) {
         let headCoins = 0;
         let damage = basePower;

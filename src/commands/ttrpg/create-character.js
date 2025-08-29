@@ -1,5 +1,6 @@
-const { SlashCommandBuilder, TextChannel } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const characterService = require('../../service/characterService');
+const Character = require('../../core/Character');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -44,20 +45,35 @@ module.exports = {
 	async execute(interaction) {
 		const characterOwner = interaction.options.getUser('target') ?? interaction.member;
 		const userId = characterOwner.id;
-		const characterData = {
-			name: interaction.options.getString('name'),
-			strength: interaction.options.getNumber('strength'),
-			dexterity: interaction.options.getNumber('dexterity'),
-			knowledge: interaction.options.getNumber('knowledge'),
-			psyche: interaction.options.getNumber('psyche'),
-			face: interaction.options.getNumber('face'),
-			userId: userId
-		};
 
-		const newCharacter = await characterService.createCharacter(characterData);
+		const characterInstance = new Character(
+			interaction.options.getString('name'),
+			interaction.options.getNumber('strength'),
+			interaction.options.getNumber('dexterity'),
+			interaction.options.getNumber('knowledge'),
+			interaction.options.getNumber('psyche'),
+			interaction.options.getNumber('face'),
+			userId
+		);
+
+		const newCharacter = await characterService.createCharacter(characterInstance);
 
 		if (newCharacter) {
-			await interaction.reply(`Character ${characterData.name} was created. Owner: ${characterOwner.displayName}`);
+			resultEmbed = new EmbedBuilder()
+				.setColor(0x00FF00)
+				.setTitle(`✅ Character "${characterInstance.name}" Created!`)
+				.setDescription('**Slug**: `' + characterInstance.slug() + '` (Remember the slug, as it\'s used for most of the commands)')
+				.addFields(
+					{ name: 'Strength', value: characterInstance.strength.toString(), inline: true },
+					{ name: 'Dexterity', value: characterInstance.dexterity.toString(), inline: true },
+					{ name: 'Knowledge', value: characterInstance.knowledge.toString(), inline: true },
+					{ name: 'Psyche', value: characterInstance.psyche.toString(), inline: true },
+					{ name: 'Face', value: characterInstance.face.toString(), inline: true },
+					{ name: '\u200b', value: '\u200b' }
+				)
+				.setTimestamp()
+				.setFooter({ text: `Requested by ${interaction.user.username}` });
+			await interaction.reply(({ embeds: [resultEmbed] }));
 		} else {
 			await interaction.reply('Error when trying to create character. Please try again.');
 		}

@@ -4,3 +4,4 @@ config.json
 /generated/prisma
 /generated/prisma
 old-commands
+local-images

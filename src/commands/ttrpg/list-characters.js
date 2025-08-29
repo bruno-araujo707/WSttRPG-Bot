@@ -18,7 +18,7 @@ module.exports = {
 			prevEmoji: '◀️',
 			nextEmoji: '▶️',
 			lastEmoji: '⏭',
-			idle: 30000,
+			idle: 60000,
 			ephemeral: false,
 			loop: true
 		});
@@ -27,26 +27,31 @@ module.exports = {
 		const characters = await characterService.listCharactersFromUser({ userId: targetUser.id });
 
 		if (!characters || characters.length === 0) {
-			return interaction.reply({ content: `${targetUser.username} não possui personagens.`, ephemeral: true });
+			return interaction.reply({ content: `${targetUser.username} doesn't have any character.`, ephemeral: true });
 		}
 
 		const embeds = characters.map(character => {
 			return new EmbedBuilder()
 				.setColor(0x5865F2)
 				.setTitle(character.name)
-				.setAuthor({ name: `Personagem de ${targetUser.username}`, iconURL: targetUser.displayAvatarURL() })
+				.setDescription('**Slug:** ' + '`' + character.slug + '`')
+				.setAuthor({ name: `${targetUser.username}'s character`, iconURL: targetUser.displayAvatarURL() })
 				.setImage(character.imageUrl)
 				.addFields(
-					{ name: '💪 Força', value: character.strength.toString(), inline: true },
-					{ name: '🏃 Destreza', value: character.dexterity.toString(), inline: true },
-					{ name: '🧠 Conhecimento', value: character.knowledge.toString(), inline: true },
-					{ name: '🧘 Psique', value: character.psyche.toString(), inline: true },
-					{ name: '🎭 Face', value: character.face.toString(), inline: true }
+					{ name: 'Current HP', value: character.currentHp.toString(), inline: true },
+					{ name: 'Max. HP', value: character.maxHp.toString(), inline: true },
+					{ name: 'Current SP', value: character.currentSp.toString(), inline: true },
+					{ name: 'Max SP', value: character.maxSp.toString(), inline: true },
+					{ name: 'Strenght', value: character.strength.toString(), inline: true },
+					{ name: 'Dexterity', value: character.dexterity.toString(), inline: true },
+					{ name: 'Knowledge', value: character.knowledge.toString(), inline: true },
+					{ name: 'Psyche', value: character.psyche.toString(), inline: true },
+					{ name: 'Face', value: character.face.toString(), inline: true }
 				);
 		});
 
 		pagination.setEmbeds(embeds, (embed, index, array) => {
-			return embed.setFooter({ text: `Personagem ${index + 1} de ${array.length} • Solicitado por ${interaction.user.username}` });
+			return embed.setFooter({ text: `${index + 1} / ${array.length} • Requested by ${interaction.user.username}` });
 		});
 		
 		await pagination.render();

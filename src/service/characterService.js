@@ -12,36 +12,46 @@ const characterService = {
                 },
                 select: {
                     name: true,
+                    slug: true,
+                    imageUrl: true,
+                    maxHp: true,
+                    maxSp: true,
+                    currentHp: true,
+                    currentSp: true,
                     strength: true,
                     dexterity: true,
                     knowledge: true,
                     psyche: true,
                     face: true,
-                    imageUrl: true,   
                 },
             });
 
             return characters;
         } catch (error) {
-            console.error("Error when listing characters:", error);
+            console.error("Erro ao buscar personagem:", error);
             return [];
         }
     },
 
-    async createCharacter(characterData) {
+    async createCharacter(characterInstance) {
         try {
-            console.log(`Dados do personagem: ${characterData}`);
-            const user = await userService.getOrCreateUser({discordUserId: characterData.userId});
+            console.log(`Dados do personagem: ${characterInstance}`);
+            const user = await userService.getOrCreateUser({discordUserId: characterInstance.userId});
             console.log(user.id);
             const character = await prisma.character.create({
                 data: {
-                    name: characterData.name,
+                    name: characterInstance.name,
+                    slug: characterInstance.slug(),
                     imageUrl: process.env.DEFAULT_IMAGE_TEST,
-                    strength: characterData.strength,
-                    dexterity: characterData.dexterity,
-                    knowledge: characterData.knowledge,
-                    psyche: characterData.psyche,
-                    face: characterData.face,
+                    strength: characterInstance.strength,
+                    dexterity: characterInstance.dexterity,
+                    knowledge: characterInstance.knowledge,
+                    psyche: characterInstance.psyche,
+                    face: characterInstance.face,
+                    maxHp: characterInstance.hp(),
+                    currentHp: characterInstance.hp(),
+                    maxSp: characterInstance.sp(),
+                    currentSp: characterInstance.sp(),
                     user: {
                         connect: {
                             id: user.id
@@ -51,11 +61,68 @@ const characterService = {
             });
             console.log(`Personagem criado: ${character}`);
 
-            return character
+            return character;
         } catch (error) {
-            console.error("Error when creating character:", error);
+            console.error("Erro ao buscar personagem:", error);
         }
-    }
+    },
+
+    async findCharacter(slug) {
+        try {
+            const character = await prisma.character.findFirst({
+                where: {
+                    slug: slug 
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    imageUrl: true,
+                    maxHp: true,
+                    maxSp: true,
+                    currentHp: true,
+                    currentSp: true,
+                    strength: true,
+                    dexterity: true,
+                    knowledge: true,
+                    psyche: true,
+                    face: true,
+                },
+            });
+            console.log(`Personagem encontrado: ${character}`);
+
+            return character;
+        } catch (error) {
+            console.error("Erro ao buscar personagem:", error);
+        }
+    },
+
+    async getMainCharacter() {
+        try {
+            const character = await prisma.character.findFirst({
+                select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    imageUrl: true,
+                    maxHp: true,
+                    maxSp: true,
+                    currentHp: true,
+                    currentSp: true,
+                    strength: true,
+                    dexterity: true,
+                    knowledge: true,
+                    psyche: true,
+                    face: true,
+                },
+            });
+            console.log(`Personagem encontrado: ${character}`);
+
+            return character;
+        } catch (error) {
+            console.error("Erro ao buscar personagem:", error);
+        }
+    },
 }
 
 module.exports = characterService;

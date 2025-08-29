@@ -23,13 +23,18 @@ model User {
 model Character {
   id  Int @id @default(autoincrement())
   name String
-  slug String
+  slug String @unique
   imageUrl String?
   strength Int
   dexterity Int
   knowledge Int
   psyche Int
   face Int
+  maxHp Int @default(0)
+  currentHp Int @default(0)
+  maxSp Int @default(0)
+  currentSp Int @default(0)
+  defense Int @default(4)
   user User @relation(fields: [userId], references: [id])
   userId Int
   attacks Attack[]
@@ -38,10 +43,10 @@ model Character {
 model Attack {
   id Int @id @default(autoincrement())
   name String
-  slug String
+  slug String @unique
   imageUrl String?
   power Int
-  total_coins Int
+  totalCoins Int
   coinPower Int
   coinDamage Int
   character Character @relation(fields: [characterId], references: [id])
